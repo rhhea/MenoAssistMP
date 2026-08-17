@@ -257,7 +257,7 @@ function HomePage({ onStart, onSeeResults, hasResult }) {
 }
 
 const DEFAULTS = {
-  age: 50, bmi: 25, ageAtMenarche: 12, numPregnancies: 1, smokingStatus: "never",
+  age: 50, bmi: 25, ageAtMenarche: 12, numPregnancies: 1, smokingStatus: "Never",
   periods: 6, fsh: 30, lh: 25, estradiol: 70, vitaminD: 30, systolicBP: 120,
   sleepHours: 7, exerciseMinutes: 120, stressLevel: 5,
 };
@@ -296,9 +296,9 @@ function AssessPage({ onBack, onFinish, loading, error }) {
             <Field label="Pregnancies"><input type="number" value={form.numPregnancies} onChange={set("numPregnancies")} min={0} max={10} /></Field>
             <Field label="Smoking status">
               <select value={form.smokingStatus} onChange={set("smokingStatus")}>
-                <option value="never">Never</option>
-                <option value="former">Former</option>
-                <option value="current">Current</option>
+                <option value="Never">Never</option>
+                <option value="Former">Former</option>
+                <option value="Current">Current</option>
               </select>
             </Field>
             <Field label={`Periods in the last 12 months: ${form.periods}`}>
