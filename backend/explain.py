@@ -29,12 +29,6 @@ import pandas as pd
 import shap
 
 
-# --------------------------------------------------------------------
-# Human-friendly descriptions per feature.
-# "high_phrase" / "low_phrase" describe what a HIGH or LOW value of
-# this feature typically means physiologically -- used to build the
-# sentence regardless of which direction SHAP pushed the prediction.
-# --------------------------------------------------------------------
 FEATURE_INFO = {
     "age": {
         "label": "Age",
@@ -124,15 +118,13 @@ def explain_prediction(input_row: pd.DataFrame, model, feature_cols, stage_encod
         bullets -- list of plain-English strings
     """
     explainer = shap.TreeExplainer(model, X_reference)
-    shap_values = explainer.shap_values(input_row[feature_cols])  # shape (1, n_features, n_classes)
+    shap_values = explainer.shap_values(input_row[feature_cols])
 
     pred_idx = model.predict(input_row[feature_cols])[0]
     pred_stage = stage_encoder.inverse_transform([pred_idx])[0]
 
-    # SHAP contributions toward the PREDICTED class specifically
-    contribs = shap_values[0, :, pred_idx]  # (n_features,)
+    contribs = shap_values[0, :, pred_idx]
 
-    # rank features by absolute contribution
     order = np.argsort(-np.abs(contribs))[:top_n]
 
     bullets = [f"The model predicted **{pred_stage.title()}**. Here's why, in plain terms:"]
@@ -148,8 +140,6 @@ def explain_prediction(input_row: pd.DataFrame, model, feature_cols, stage_encod
         pushed = "supported" if contrib > 0 else "worked against"
         strength = "strongly" if abs(contrib) > np.abs(contribs).mean() * 1.5 else "somewhat"
 
-        # capitalize only the first character -- .capitalize() would lowercase
-        # acronyms like "FSH"/"LH" that appear later in the sentence
         sentence_start = direction_phrase[0].upper() + direction_phrase[1:]
         bullets.append(
             f"- **{info['label']}**: {sentence_start}. "
