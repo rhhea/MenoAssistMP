@@ -5,16 +5,25 @@ Wraps outputs/menopause_stage_model.joblib (trained by build.py)
 behind a REST API so the React frontend can call it directly instead
 of the Streamlit form.
 
+Also exposes /diet-exercise-plan, which generates a Gemini-backed diet
+and exercise plan for a given (stage, diet_type) pair -- see
+diet_exercise.py for how/why that module differs from the RF stage
+model (LLM guidance vs. trained classifier).
+
 Run with:  uvicorn main:app --reload --port 8000
 """
 
 import joblib
 import pandas as pd
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from explain import explain_prediction
+from diet_exercise import DietExercisePlan, DietExerciseRequest, GeminiPlanError, generate_diet_exercise_plan
+
+load_dotenv()  # reads GEMINI_API_KEY / GEMINI_MODEL from a local .env file
 
 MODEL_PATH = "outputs/menopause_stage_model.joblib"
 
@@ -105,3 +114,11 @@ def predict(payload: AssessmentInput):
         probabilities={cls: float(p) for cls, p in zip(stage_encoder.classes_, proba)},
         explanation=explanation,
     )
+
+
+@app.post("/diet-exercise-plan", response_model=DietExercisePlan)
+def diet_exercise_plan(payload: DietExerciseRequest):
+    try:
+        return generate_diet_exercise_plan(payload)
+    except GeminiPlanError as e:
+        raise HTTPException(status_code=502, detail=str(e))
