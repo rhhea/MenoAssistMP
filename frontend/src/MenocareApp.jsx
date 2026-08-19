@@ -15,6 +15,7 @@ import {
   BookOpen,
   Stethoscope,
 } from "lucide-react";
+import ExerciseDiet from "./ExerciseDiet";
 
 /* ---------------------------------------------------------------
    Design tokens
@@ -830,7 +831,11 @@ export default function MenoAssistApp() {
       {page === "results" && (
         <ResultsPage result={result} onRetake={() => setPage("assess")} onCarePlan={() => setPage("care")} />
       )}
-      {page === "care" && <CarePlanPage result={result} onBack={() => setPage("results")} />}
+      {page === "care" && (
+        <div className="mc-page mc-page-narrow">
+          <ExerciseDiet stage={result?.stage} />
+        </div>
+      )}
     </div>
   );
 }
