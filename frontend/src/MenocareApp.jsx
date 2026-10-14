@@ -16,6 +16,7 @@ import {
   Stethoscope,
 } from "lucide-react";
 import ExerciseDiet from "./ExerciseDiet";
+import Chatbot from "./Chatbot";
 
 /* ---------------------------------------------------------------
    Design tokens
@@ -530,7 +531,7 @@ function AssessPage({ onBack, onFinish, loading, error }) {
 /* ---------------------------------------------------------------
    RESULTS — stacked vertically: stage, chart, explanation
 --------------------------------------------------------------- */
-function ResultsPage({ result, onRetake, onCarePlan }) {
+function ResultsPage({ result, onRetake, onCarePlan, onChat })  {
   if (!result) {
     return (
       <div className="mc-page mc-empty">
@@ -592,11 +593,11 @@ function ResultsPage({ result, onRetake, onCarePlan }) {
         </GhostButton>
       </div>
 
-      <button className="mc-chatbot-teaser" style={{ cursor: FLOWER_CURSOR }} disabled>
-        <MessageCircle size={15} strokeWidth={2.2} />
-        Emotional check-in companion
-        <span className="mc-teaser-tag">Coming soon</span>
-      </button>
+      <button className="mc-chatbot-teaser" style={{ cursor: FLOWER_CURSOR }} onClick={onChat}>
+  <MessageCircle size={15} strokeWidth={2.2} />
+  Emotional check-in companion
+  <span className="mc-teaser-tag">Open</span>
+</button>
 
       <p className="mc-caption">
         Demo prediction from a reference model, not a diagnostic device. Consult a doctor for actual staging
@@ -699,11 +700,12 @@ export default function MenoAssistApp() {
   };
 
   const nav = [
-    { key: "home", label: "Home" },
-    { key: "assess", label: "Assessment" },
-    { key: "results", label: "Results", disabled: !result },
-    { key: "care", label: "Care Plan", disabled: !result },
-  ];
+  { key: "home", label: "Home" },
+  { key: "assess", label: "Assessment" },
+  { key: "results", label: "Results", disabled: !result },
+  { key: "care", label: "Care Plan", disabled: !result },
+  { key: "chat", label: "Chat", disabled: !result },   // add this
+];
 
   return (
     <div className="mc-app-bg">
@@ -829,13 +831,26 @@ export default function MenoAssistApp() {
         <AssessPage onBack={() => setPage("home")} onFinish={finishAssess} loading={loading} error={error} />
       )}
       {page === "results" && (
-        <ResultsPage result={result} onRetake={() => setPage("assess")} onCarePlan={() => setPage("care")} />
-      )}
+  <ResultsPage
+    result={result}
+    onRetake={() => setPage("assess")}
+    onCarePlan={() => setPage("care")}
+    onChat={() => setPage("chat")}
+  />
+)}
       {page === "care" && (
         <div className="mc-page mc-page-narrow">
           <ExerciseDiet stage={result?.stage} />
         </div>
       )}
+     {result && (
+  <div
+    className="mc-page mc-page-narrow"
+    style={{ display: page === "chat" ? undefined : "none" }}
+  >
+    <Chatbot stage={result.stage} userId="demo-user" />
+  </div>
+)}
     </div>
   );
 }

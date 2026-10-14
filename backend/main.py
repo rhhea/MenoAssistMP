@@ -25,6 +25,7 @@ from diet_exercise import DietExercisePlan, DietExerciseRequest, GeminiPlanError
 
 load_dotenv()  # reads GEMINI_API_KEY / GEMINI_MODEL from a local .env file
 
+
 MODEL_PATH = "outputs/menopause_stage_model.joblib"
 
 app = FastAPI(title="Menocare API")
@@ -41,6 +42,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+#chatbot router
+from chatbot import router as chatbot_router
+app.include_router(chatbot_router)
 
 bundle = joblib.load(MODEL_PATH)
 model = bundle["model"]

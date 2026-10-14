@@ -3,3 +3,10 @@ pandas
 numpy
 scikit-learn
 joblib
+transformers
+torch
+sentence-transformers
+datasets
+openai
+numpy
+python-dotenv
